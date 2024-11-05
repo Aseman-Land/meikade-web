@@ -1,0 +1,24 @@
+{
+    "home-page": {
+        "title": "Home Page",
+        "test": "Test"
+    },
+    "search-page": {
+        "title": "Search Page",
+        "test": "Test"
+    },
+    "explore-page": {
+        "title": "Explore Page",
+        "test": "Test"
+    },
+    "profile-page": {
+        "title": "Profile Page",
+        "test": "Test"
+    },
+    "navigator": {
+        "home": "Home",
+        "search": "Search",
+        "explore": "Explore",
+        "profile": "Profile"
+    }
+}

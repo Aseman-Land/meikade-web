@@ -1,0 +1,24 @@
+{
+    "home-page": {
+        "title": "می‌کده",
+        "test": "تست"
+    },
+    "search-page": {
+        "title": "جستجو",
+        "test": "تست"
+    },
+    "explore-page": {
+        "title": "کاوش",
+        "test": "تست"
+    },
+    "profile-page": {
+        "title": "پروفایل",
+        "test": "تست"
+    },
+    "navigator": {
+        "home": "می‌کده",
+        "search": "جستجو",
+        "explore": "کاوش",
+        "profile": "پروفایل"
+    }
+}
