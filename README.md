@@ -1,4 +1,4 @@
-# React project
+# Meikade Web
 
 1. Run `npm install` in project directory
 2. Enter `npm start`
