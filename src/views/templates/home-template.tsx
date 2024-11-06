@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, AppBar, Box, Snackbar, Toolbar, Typography } from "@mui/material";
 import Container, { ContainerProps } from "@mui/material/Container";
 import { useTranslation } from "react-i18next";
 import * as React from "react";
@@ -55,7 +55,16 @@ const HomeTemplate: React.FC<HomeTemplateProps> = (props: HomeTemplateProps) => 
                 paddingRight: '0px',
             }}
         >
-            {props.children}
+            <AppBar sx={{position: 'fixed', boxShadow: 'unset'}} >
+                <Toolbar sx={{gap: '10px', background: '#fff'}}>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#333' }}>
+                        Meikadeسسی
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Box sx={{marginTop: '100px'}}>
+                {props.children}
+            </Box>
             <Snackbar open={hasError.length? true : false} autoHideDuration={3000} onClose={function(){ setError(''); }}>
                 <Alert severity="error" sx={{ width: '100%' }}>
                     {props.error}

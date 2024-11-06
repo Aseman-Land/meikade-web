@@ -6,15 +6,18 @@ import HomeTemplate from '../templates/home-template';
 import MButton from '../../components/MButton';
 import { getPoets } from '../../services/poet';
 import React from 'react';
+import { Poet } from '../../models/poet';
 
 const HomePage = () => {
     const { t } = useTranslation();
     const theme = useTheme();
     const navigate = useNavigate();
 
+    const [poets, setPoets] = React.useState<Array<Poet>>([]);
+
     const reload = async () => {
         const poets = await getPoets();
-        console.log(poets);
+        setPoets(poets);
     };
 
     React.useEffect(() => {
@@ -24,11 +27,9 @@ const HomePage = () => {
     return <HomeTemplate
         title={t('home-page.title')!}
     >
-        <MButton
-            onClick={() => navigate('/test')}
-        >
-            <Typography>{t('home-page.test')}</Typography>
-        </MButton>
+        {poets.map((p: Poet, idx: number) => (
+            <Typography>{p.name}</Typography>
+        ))}
     </HomeTemplate>
 }
 

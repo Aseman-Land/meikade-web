@@ -4,7 +4,7 @@ import { Paper } from '@mui/material';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { Link } from "react-router-dom";
-import { PersonOutline, HomeOutlined, ExploreOutlined, Search } from '@mui/icons-material'
+import { PersonOutline, HomeOutlined, ExploreOutlined, Search, BookOnline, BookOutlined } from '@mui/icons-material'
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
@@ -22,8 +22,8 @@ const MenuInBottomLayout = (props:any) => {
     useEffect(() => {
         var currentValue: string = 'home';
         switch (window.location.pathname) {
-        case '/search':
-            currentValue = 'search';
+        case '/poets':
+            currentValue = 'poets';
             break;
         case '/profile':
             currentValue = 'profile';
@@ -70,19 +70,19 @@ const MenuInBottomLayout = (props:any) => {
                 />
 
                 <BottomNavigationAction 
-                    label={t('navigator.search')} 
-                    value="search" 
-                    icon={<Search style={iconsStyle} />} 
-                    component={Link} 
-                    to="/search" 
-                />
-
-                <BottomNavigationAction 
                     label={t('navigator.explore')} 
                     value="explore" 
                     icon={<ExploreOutlined style={iconsStyle} />} 
                     component={Link} 
                     to="/explore"
+                />
+
+                <BottomNavigationAction 
+                    label={t('navigator.poets')} 
+                    value="poets" 
+                    icon={<BookOutlined style={iconsStyle} />} 
+                    component={Link} 
+                    to="/poets" 
                 />
 
                 <BottomNavigationAction 
