@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" translate="no">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="google" content="notranslate" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="description" content="می‌کده | گنجینه شعر و ادبیات فارسی" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <title>می‌کده</title>
+
+    <style>
+        /* Loading bar */
+
+        #app-loading {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            z-index: 99999;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #app-loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 35%;
+            height: 100%;
+            background: #881010;
+            animation: app-loading-animation 1.2s ease-in-out infinite;
+        }
+
+        @keyframes app-loading-animation {
+            0% {
+                transform: translateX(110vw);
+            }
+
+            100% {
+                transform: translateX(-110vw);
+            }
+        }
+
+        #app-loading.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Fatal error screen */
+
+        #fatal-error {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            padding: 24px;
+            overflow-y: auto;
+
+            background: #ffffff;
+            color: #222222;
+
+            font-family: Vazirmatn, Tahoma, sans-serif;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        #fatal-error img {
+            width: 112px;
+            height: 112px;
+            object-fit: contain;
+            margin-bottom: 16px;
+        }
+
+        #fatal-error h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 12px;
+        }
+
+        #fatal-error p {
+            max-width: 500px;
+            line-height: 2;
+            margin: 0 0 16px;
+        }
+
+        #fatal-error .error-details {
+            width: 100%;
+            max-width: 700px;
+            max-height: 220px;
+            overflow: auto;
+
+            padding: 12px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            background: #f3f3f3;
+            border: 1px solid #dddddd;
+
+            direction: ltr;
+            text-align: left;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: #b42318;
+        }
+
+        #fatal-error button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            margin-top: 20px;
+
+            background: #1976d2;
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+
+            cursor: pointer;
+        }
+
+        #fatal-error button:hover {
+            background: #1565c0;
+        }
+    </style>
+
+    <!-- Global error handlers -->
+    <script>
+        (function () {
+
+            function hideLoading() {
+                var loader = document.getElementById("app-loading");
+
+                if (loader) {
+                    loader.classList.add("is-hidden");
+                }
+            }
+
+            function showFatalError(title, detail) {
+                var errorElement = document.getElementById("fatal-error");
+                var titleElement = document.getElementById("fatal-error-title");
+                var detailsElement = document.getElementById("fatal-error-details");
+
+                hideLoading();
+
+                if (!errorElement) {
+                    console.error(title, detail);
+                    return;
+                }
+
+                titleElement.textContent = title || "An unexpected error occurred";
+                detailsElement.textContent = detail || "Unknown error";
+
+                errorElement.style.display = "flex";
+
+                console.error("[MiKade Fatal Error]", title, detail);
+            }
+
+            // Make the error handler accessible from React
+            window.showFatalError = showFatalError;
+
+            // JavaScript errors and failed script resources
+            window.addEventListener("error", function (event) {
+
+                var target = event.target;
+
+                // Failed script loading
+                if (target && target !== window) {
+
+                    var tagName = target.tagName
+                        ? target.tagName.toLowerCase()
+                        : "";
+
+                    if (tagName === "script") {
+
+                        showFatalError(
+                            "خطا در بارگذاری برنامه",
+                            "Failed to load JavaScript file:\n" +
+                            (target.src || "Unknown script")
+                        );
+
+                    }
+
+                    return;
+                }
+
+                // Runtime JavaScript error
+                var message = event.message || "Unknown JavaScript error";
+                // Safari / iOS may hide cross-origin JavaScript error details
+                if (
+                    message.trim().toLowerCase() === "script error." &&
+                    !event.error
+                ) {
+                    console.warn(
+                        "[MiKade] Opaque JavaScript error (details hidden by browser)",
+                        {
+                            message: event.message,
+                            filename: event.filename,
+                            lineno: event.lineno,
+                            colno: event.colno,
+                            target: event.target
+                        }
+                    );
+
+                    // Do not crash the entire application
+                    return;
+                }
+
+                var details = "JavaScript Error:\n" + message;
+
+                if (event.filename) {
+                    details += "\n\nFile: " + event.filename;
+                }
+
+                if (event.lineno) {
+                    details += "\nLine: " + event.lineno;
+                }
+
+                if (event.colno) {
+                    details += "\nColumn: " + event.colno;
+                }
+
+                showFatalError(
+                    "خطایی هنگام اجرای برنامه رخ داد",
+                    details
+                );
+
+            }, true);
+
+
+            // Unhandled Promise rejections
+            window.addEventListener("unhandledrejection", function (event) {
+
+                var reason = event.reason;
+                var details = "Unhandled Promise Rejection:\n";
+
+                try {
+                    if (reason && reason.stack) {
+                        details += reason.stack;
+                    } else if (reason && reason.message) {
+                        details += reason.message;
+                    } else {
+                        details += String(reason || "Unknown promise rejection");
+                    }
+                } catch (e) {
+                    details += "Unable to read error details";
+                }
+
+                showFatalError(
+                    "خطایی در پردازش درخواست رخ داد",
+                    details
+                );
+
+            });
+
+
+        })();
+    </script>
+
+</head>
+
+<body>
+
+    <noscript>
+        برای استفاده از می‌کده باید JavaScript مرورگر خود را فعال کنید.
+    </noscript>
+
+    <div id="root"></div>
+
+    <!-- Loading bar -->
+    <div id="app-loading" role="progressbar" aria-label="در حال بارگذاری"></div>
+
+    <!-- Fatal error screen -->
+    <div id="fatal-error" role="alert" aria-live="assertive">
+
+        <img src="/assets/images/logo_transparent.png" alt="می‌کده" />
+
+        <h2 id="fatal-error-title">
+            خطایی رخ داده است
+        </h2>
+
+        <p>
+            متأسفانه در بارگذاری یا اجرای می‌کده مشکلی پیش آمده است.
+            لطفاً اتصال اینترنت خود را بررسی کنید و مجدداً تلاش کنید.
+        </p>
+
+        <pre class="error-details" id="fatal-error-details"></pre>
+
+        <button onclick="window.location.reload()">
+            تلاش مجدد
+        </button>
+
+    </div>
+
+
+    <!-- React application -->
+    <script id="react-loader" type="module" src="/src/main.tsx"></script>
+
+    <!-- Unsupported browser fallback -->
+    <script nomodule>
+        window.showFatalError(
+            "مرورگر شما پشتیبانی نمی‌شود",
+            "Your browser does not support JavaScript ES modules. Please update your browser."
+        );
+    </script>
+
+
+    <script>
+        (function () {
+
+            var root = document.getElementById("root");
+            var loader = document.getElementById("app-loading");
+            var appScript = document.getElementById("react-loader");
+
+            function hideLoading() {
+                if (loader) {
+                    loader.classList.add("is-hidden");
+                }
+            }
+
+            // Explicitly handle application entry-point loading errors
+            if (appScript) {
+
+                appScript.addEventListener("error", function () {
+
+                    window.showFatalError(
+                        "خطا در بارگذاری می‌کده",
+                        "Unable to load the React application entry point:\n" +
+                        appScript.src
+                    );
+
+                });
+
+            }
+
+            // Hide loading bar after React renders its first content
+            if (root && window.MutationObserver) {
+
+                var observer = new MutationObserver(function () {
+
+                    if (root.childNodes.length > 0) {
+                        hideLoading();
+                        observer.disconnect();
+                    }
+
+                });
+
+                observer.observe(root, {
+                    childList: true,
+                    subtree: true
+                });
+
+                // Handle an already-rendered application
+                if (root.childNodes.length > 0) {
+                    hideLoading();
+                    observer.disconnect();
+                }
+
+            } else if (appScript) {
+
+                // Fallback for browsers without MutationObserver
+                appScript.addEventListener("load", function () {
+                    setTimeout(hideLoading, 300);
+                });
+
+            }
+
+
+            // Save FCM token if the native bridge is available
+            function checkState() {
+
+                try {
+
+                    var tokenInterface = window.TokenInterface;
+
+                    if (
+                        tokenInterface &&
+                        typeof tokenInterface.getToken === "function"
+                    ) {
+
+                        var token = tokenInterface.getToken();
+
+                        if (token) {
+                            window.localStorage.setItem("fcm-token", token);
+                        }
+
+                    }
+
+                } catch (error) {
+
+                    console.warn("Unable to access FCM token:", error);
+
+                }
+
+            }
+
+            window.addEventListener("load", function () {
+                setTimeout(checkState, 500);
+            });
+
+        })();
+    </script>
+
+</body>
+
+</html>

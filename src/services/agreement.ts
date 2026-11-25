@@ -1,0 +1,34 @@
+/**
+ * ⚠️ 🤔 Look at this file. Now look at your keyboard. Now back to this file.
+ * This is an AUTOMATICALLY GENERATED FILE. If you make changes here,
+ * Git will show your name in the `git blame`, but the generator will erase it.
+ * Don't play yourself. Don't touch it.
+ */
+
+import axios from "axios";
+import { globalHandleError } from "../layouts/mainframe";
+import { MkAgreement } from "../models/agreement";
+import { API } from "../models/api";
+import request from "../utils/axios";
+
+export namespace MkAgreementServices {
+
+    export const getLatest = async (): Promise<API<MkAgreement>> => {
+        try {
+            const res = await request.get<API<MkAgreement>>(`/v4/agreement/latest`);
+            const resData: API<MkAgreement> = {...res.data, code: res.status}
+            if (!resData.status) globalHandleError(resData.message ?? "Unknown error on getLatest");
+                return resData;
+        } catch(e: any) {
+            if (axios.isAxiosError<API<MkAgreement>>(e) && e.response) {
+                const serverResponse = e.response.data;
+                globalHandleError(serverResponse?.message ?? `Error ${e.response.status}: Request failed`);
+                return serverResponse;
+            } else {
+                let errorMessage = "getLatest failed.";
+                globalHandleError(errorMessage);
+                return {result: undefined, status: false, message: errorMessage, code: undefined};
+            };
+        };
+    };
+}

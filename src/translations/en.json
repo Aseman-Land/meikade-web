@@ -1,0 +1,9 @@
+{
+    "app": {
+        "title": "Tricks"
+    },
+    "user": {
+        "username": "Username",
+        "password": "Password"
+    }
+}
