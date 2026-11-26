@@ -20,7 +20,9 @@ import ContentNoteEdit from '../views/notes/contentnoteedit';
 import PasswordChanger from '../views/settings/passwordchange';
 import SetupDialog from '../views/setup/setupdialog';
 import AgreementDialog from '../views/user/agreementdialog';
+import ShareItem from '../views/user/shareitem';
 import { DefaultSignInDialog } from '../views/user/signin';
+import AddPWAPage from '../components/addpwadialog';
 
 let itemHandleError_method: (text: string | null) => void = () => { };
 
@@ -85,6 +87,8 @@ const MainFrame = (props: MainFrameProps) => {
     const [infoMessage, setInfoMessage] = React.useState<string | null>(null);
     const [signInOpen, setSignInOpen] = React.useState<boolean>(false);
     const [agreementDialog, setAgreementDialog] = React.useState<boolean>(false);
+
+    const [shareContent, setShareContent] = React.useState<SimplePoemContent | null>(null);
 
     const [selectedAchievement, setSelectedAchievement] = React.useState<AchievementItem | null>(null);
     const [setupDialog, setSetupDialog] = React.useState<number | null>(null);
@@ -219,6 +223,44 @@ const MainFrame = (props: MainFrameProps) => {
         return text;
     }
 
+    var pwa_dialog: boolean = false;
+    try {
+        pwa_dialog = (localStorage.getItem('pwa_dialog') == 'true');
+    } catch (e) { }
+
+    var workerScript: boolean = false;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile && !pwa_dialog) {
+        if (navigator.serviceWorker) {
+            navigator.serviceWorker.getRegistration('/').then((registration) => {
+                if (registration) {
+                    console.log('PWA Mode: Yes (Service Worker Registered)');
+                } else {
+                    setPWAVisible(true);
+                }
+            });
+        } else {
+            workerScript = true;
+        }
+    }
+
+    const [pwaVisible, setPWAVisible] = React.useState<boolean>(workerScript);
+
+    if (pwaVisible) {
+        return <AddPWAPage
+            onDone={() => {
+                try {
+                    localStorage.setItem('pwa_dialog', 'true');
+                } catch { }
+                setPWAVisible(false);
+            }}
+        />;
+    } else {
+        try {
+            localStorage.setItem('pwa_dialog', 'true');
+        } catch { }
+    }
+
     return <Box {...props}>
         <Outlet />
         <DefaultSignInDialog open={signInOpen} onClose={() => setSignInOpen(false)} />
@@ -305,8 +347,12 @@ const MainFrame = (props: MainFrameProps) => {
             }
             <MenuItem
                 onClick={() => {
-                    const link: string = contentEdit ? window.location.origin + '/content/' + contentEdit.id.toString() : window.location.href;
-                    handleShare(getText(), link);
+                    if (contentEdit && contentEdit.poem) {
+                        setShareContent(contentEdit);
+                    } else {
+                        const link: string = contentEdit ? window.location.origin + '/content/' + contentEdit.id.toString() : window.location.href;
+                        handleShare(getText(), link);
+                    }
                     setContentEditMenu(false);
                 }}
             >
@@ -330,6 +376,14 @@ const MainFrame = (props: MainFrameProps) => {
                 </MenuItem>
             </>}
         </Menu>
+
+        <MeikadeDrawer
+            open={shareContent != null}
+            onClose={() => setShareContent(null)}
+            anchor="bottom"
+        >
+            <ShareItem contentItem={shareContent ?? undefined} />
+        </MeikadeDrawer>
 
         <MeikadeDrawer
             open={selectedAchievement != null}

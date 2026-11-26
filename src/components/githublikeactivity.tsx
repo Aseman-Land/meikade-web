@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
-import { Box, Tooltip, Typography, useTheme } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
+import { Box, Tooltip, Typography, useTheme } from "@mui/material";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MkActivitySummery, MkActivitySummeryDay, MkActivitySummeryUnit } from "../models/activity";
 import { globalBorderRadiusValue } from "../utils/theme";

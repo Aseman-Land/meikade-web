@@ -10,6 +10,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import AchievementItemCard, { AchievementItem } from '../../components/achievementitemcard';
 import AvatarPoemCard from '../../components/avatarpoemcard';
 import FollowButton from '../../components/followbutton';
+import GitLikeActivity from '../../components/githublikeactivity';
 import ListItemCard from '../../components/listitemcard';
 import MeikadeAppBar from '../../components/meikadeappbar';
 import MeikadeDialog from '../../components/meikadedialog';
@@ -18,6 +19,7 @@ import SimpleContentCard from '../../components/simplecontentcard';
 import UserFullname from '../../components/userfullname';
 import { showAchievement } from '../../layouts/mainframe';
 import { MkAchievement, MkUserAchievement } from '../../models/achievement';
+import { MkActivitySummery } from '../../models/activity';
 import { MkBook, MkUserWithBooks } from '../../models/book';
 import { MkFullContent } from '../../models/content';
 import { MkListResult } from '../../models/list';
@@ -34,8 +36,6 @@ import AddListDialog from '../lists/addlistdialog';
 import MyAchievementsDialog from '../profile/myachievementsdialog';
 import FollowList from './followlist';
 import { DefaultSignInDialog } from './signin';
-import GitLikeActivity from '../../components/githublikeactivity';
-import { MkActivitySummery } from '../../models/activity';
 
 export type UserPageCustomListrops = {
     title: string,

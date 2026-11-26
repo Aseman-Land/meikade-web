@@ -20,6 +20,8 @@ const SubmitDonateDialog = (props: SubmitDonateDialogProps) => {
     const [amount, setAmount] = React.useState<number | null>(null);
 
     const submit = async () => {
+        if (loadingRef.current) return;
+
         loadingRef.current = true;
         setIsLoading(true);
         try {

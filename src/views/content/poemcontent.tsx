@@ -877,6 +877,16 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                         </Box>
                     }
 
+                    {content.source && <Typography
+                        sx={{
+                            alignSelf: 'center',
+                            padding: '20px 0px 0px 0px',
+                            opacity: 0.6,
+                        }}
+                    >
+                        {t('poem.source-text').replaceAll('%1', content.source)}
+                    </Typography>}
+
                     <Box
                         sx={{
                             display: 'flex',
