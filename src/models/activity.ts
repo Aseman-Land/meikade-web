@@ -20,6 +20,22 @@ export type MkActivity = {
     updated_at: Date,
 }
 
+export type MkActivitySummery = {
+    list: Array<MkActivitySummeryDay>,
+}
+
+export type MkActivitySummeryDay = {
+    activities: Map<string, MkActivitySummeryUnit>,
+    date: string,
+}
+
+export type MkActivitySummeryUnit = {
+    count: number,
+    duration: number,
+    type: string,
+    volume: number,
+}
+
 export type MkAddActivity = {
     content_id: number,
     type: string,

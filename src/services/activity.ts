@@ -7,6 +7,7 @@
 
 import axios from "axios";
 import { globalHandleError } from "../layouts/mainframe";
+import { MkActivitySummery } from "../models/activity";
 import { API } from "../models/api";
 import request from "../utils/axios";
 
@@ -45,6 +46,26 @@ export namespace MkActivityServices {
                 return serverResponse;
             } else {
                 let errorMessage = "submit failed.";
+                globalHandleError(errorMessage);
+                return {result: undefined, status: false, message: errorMessage, code: undefined};
+            };
+        };
+    };
+
+
+    export const summeryOfUser = async (user_id: number): Promise<API<MkActivitySummery>> => {
+        try {
+            const res = await request.get<API<MkActivitySummery>>(`/v4/activity/summery/${user_id}`);
+            const resData: API<MkActivitySummery> = {...res.data, code: res.status}
+            if (!resData.status) globalHandleError(resData.message ?? "Unknown error on summeryOfUser");
+                return resData;
+        } catch(e: any) {
+            if (axios.isAxiosError<API<MkActivitySummery>>(e) && e.response) {
+                const serverResponse = e.response.data;
+                globalHandleError(serverResponse?.message ?? `Error ${e.response.status}: Request failed`);
+                return serverResponse;
+            } else {
+                let errorMessage = "summeryOfUser failed.";
                 globalHandleError(errorMessage);
                 return {result: undefined, status: false, message: errorMessage, code: undefined};
             };

@@ -22,17 +22,20 @@ import { MkBook, MkUserWithBooks } from '../../models/book';
 import { MkFullContent } from '../../models/content';
 import { MkListResult } from '../../models/list';
 import { MkAchievementServices } from '../../services/achievement';
+import { MkActivityServices } from '../../services/activity';
 import { MkContentServices } from '../../services/content';
 import { MkListServices } from '../../services/list';
 import { MkUserServices } from '../../services/user';
 import * as UserGlobal from "../../services/user-global";
-import { globalBorderRadiusValue, theme } from '../../utils/theme';
+import { darkMode, globalBorderRadiusValue, theme } from '../../utils/theme';
 import { sleep } from '../../utils/tools';
 import AddBookDialog from '../book/addbookdialog';
 import AddListDialog from '../lists/addlistdialog';
 import MyAchievementsDialog from '../profile/myachievementsdialog';
 import FollowList from './followlist';
 import { DefaultSignInDialog } from './signin';
+import GitLikeActivity from '../../components/githublikeactivity';
+import { MkActivitySummery } from '../../models/activity';
 
 export type UserPageCustomListrops = {
     title: string,
@@ -173,6 +176,7 @@ export const UserPageBase = React.forwardRef<UserPageBaseRef, UserPageBaseProps>
     const [contents, setContents] = React.useState<MkFullContent[]>([]);
     const [lists, setLists] = React.useState<MkListResult[]>([]);
     const [achievements, setAchievements] = React.useState<AchievementItem[]>([]);
+    const [activity, setActivity] = React.useState<MkActivitySummery | null>(null);
     const [open, setOpen] = React.useState(false);
     const [isClamped, setIsClamped] = React.useState(false);
     const textRef = React.useRef<HTMLDivElement>(null);
@@ -232,12 +236,20 @@ export const UserPageBase = React.forwardRef<UserPageBaseRef, UserPageBaseProps>
                 else
                     setLists([]);
 
+                const activitySummery = await MkActivityServices.summeryOfUser(user.id);
+                if (activitySummery.status && activitySummery.result) {
+                    setActivity(activitySummery.result);
+                } else {
+                    setActivity(null);
+                }
+
                 const achievements = await MkAchievementServices.getUserAchievements(user.id);
                 const globalAchievements = await MkAchievementServices.getAchievements();
 
                 const achievementMap: Map<number, AchievementItem> = new Map<number, AchievementItem>();
                 const achievementList: Array<AchievementItem> = [];
                 const achievementInserted: Array<number> = [];
+
 
                 if (achievements.status && achievements.result) {
                     achievements.result.forEach((ach: MkUserAchievement) => {
@@ -558,6 +570,23 @@ export const UserPageBase = React.forwardRef<UserPageBaseRef, UserPageBaseProps>
                         {user.about}
                     </Typography>
                 </MeikadeDialog>
+                {activity && user && user.verified_level < 3 && <>
+                    <Typography sx={{
+                        fontSize: '16px',
+                        fontWeight: '800',
+                        marginTop: '10px',
+                        marginBottom: '10px'
+                    }}
+                    >
+                        {t('activities.title')}
+                    </Typography>
+                    <GitLikeActivity
+                        summery={activity}
+                        colors={{
+                            empty: darkMode ? '#444' : '#eee'
+                        }}
+                    />
+                </>}
                 {(achievements.length > 0 || editable) && <>
                     <Box
                         sx={{

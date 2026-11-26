@@ -397,6 +397,7 @@
         }
     },
     "activities": {
+        "title": "فعالیت‌ها",
         "read": {
             "content": "درنگ در آثار",
             "minutes": "دقیقه‌های درنگ",
@@ -404,6 +405,15 @@
         },
         "write": {
             "verses": "شعرهای نوشته شده"
+        },
+        "githubcomponent": {
+            "read": "مطالعه",
+            "write": "نوشتن",
+            "both": "مطالعه و نوشتن",
+            "empty": "بدون فعالیت",
+            "count": "فعالیت",
+            "volume": "حجم",
+            "duration": "ثانیه"
         }
     },
     "achievements": {
