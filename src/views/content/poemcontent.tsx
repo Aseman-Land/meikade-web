@@ -22,6 +22,9 @@ import { sleep } from '../../utils/tools';
 import { DefaultSignInDialog } from '../user/signin';
 import AiAnalizingDialog from './aianalizingdialog';
 import SingleVerseItem, { VerseGroup } from './singleverseitem';
+import MeikadeDrawer from '../../components/meikadedrawer';
+import ShareItem from '../user/shareitem';
+import { SimplePoemContent } from '../../components/simplepoemcard';
 
 export interface PoemContentRef {
     reload: () => Promise<void>;
@@ -57,6 +60,8 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
 
     const [selectedText, setSelectedText] = React.useState<string>('');
     const [note, setNote] = React.useState<MkFullContentNote | null>(null);
+
+    const [shareContent, setShareContent] = React.useState<SimplePoemContent | null>(null);
 
     const [listedVerseIds, setListedVerseIds] = React.useState<Array<number>>([]);
     const [ratedVerseIds, setRatedVerseIds] = React.useState<Array<number>>([]);
@@ -1079,7 +1084,11 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                 <Typography>{t('poem.copy')}</Typography>
             </MenuItem>
             <MenuItem onClick={() => {
-                handleShare(getText());
+                if (content && content.poem) {
+                    setShareContent(content);
+                } else {
+                    handleShare(getText());
+                }
                 handleClose()
             }}>
                 <ListItemIcon>
@@ -1088,6 +1097,15 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                 <Typography>{t('poem.share')}</Typography>
             </MenuItem>
         </Menu>
+
+        <MeikadeDrawer
+            open={shareContent != null}
+            onClose={() => setShareContent(null)}
+            anchor="bottom"
+        >
+            <ShareItem contentItem={shareContent ?? undefined} />
+        </MeikadeDrawer>
+
         <AiAnalizingDialog
             open={aiAnalizing}
             onCloseRequest={() => setAiAnalizing(false)}
