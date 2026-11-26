@@ -673,7 +673,7 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                                         borderRadius: `${globalBorderRadiusValue / 2}px`
                                     }}
                                 >
-                                    <Typography sx={{ fontSize: '14px' }}>
+                                    <Typography sx={{ fontSize: '14px', paddingTop: '2px' }}>
                                         {"AI"}
                                     </Typography>
                                 </IconButton>}
