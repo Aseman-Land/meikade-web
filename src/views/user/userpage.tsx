@@ -223,28 +223,36 @@ export const UserPageBase = React.forwardRef<UserPageBaseRef, UserPageBaseProps>
                 if (user.verified_level == 3)
                     setCurrentTab(1);
 
-                const activities = await MkUserServices.getUserActivities(user.id);
+                const [
+                    activities,
+                    lists,
+                    activitySummery,
+                    achievements,
+                    globalAchievements,
+                ] = await Promise.all([
+                    MkUserServices.getUserActivities(user.id),
+                    MkListServices.all({
+                        user_id: user.id,
+                        offset: 0,
+                        limit: 20,
+                        search: null,
+                    }),
+                    MkActivityServices.summeryOfUser(user.id),
+                    MkAchievementServices.getUserAchievements(user.id),
+                    MkAchievementServices.getAchievements(),
+                ]);
 
-                const lists = await MkListServices.all({
-                    user_id: user.id,
-                    offset: 0,
-                    limit: 20,
-                    search: null,
-                });
                 if (lists.status && lists.result)
                     setLists(lists.result);
                 else
                     setLists([]);
 
-                const activitySummery = await MkActivityServices.summeryOfUser(user.id);
+
                 if (activitySummery.status && activitySummery.result) {
                     setActivity(activitySummery.result);
                 } else {
                     setActivity(null);
                 }
-
-                const achievements = await MkAchievementServices.getUserAchievements(user.id);
-                const globalAchievements = await MkAchievementServices.getAchievements();
 
                 const achievementMap: Map<number, AchievementItem> = new Map<number, AchievementItem>();
                 const achievementList: Array<AchievementItem> = [];
@@ -342,7 +350,7 @@ export const UserPageBase = React.forwardRef<UserPageBaseRef, UserPageBaseProps>
                 sort_by_rate: currentTab == 0 ? false : true,
             });
 
-            await sleep(1000);
+            // await sleep(1000);
             if (result.status && result.result) {
                 setContents(offset > 0 ? [...contents, ...result.result] : result.result);
                 setHasMore(result.result.length == limit);

@@ -32,7 +32,7 @@ const MainMenuItem = (props: { title: string, image: string, action: (() => Prom
         setIsLoading(true);
         loadingRef.current = true;
         try {
-            await sleep(500);
+            // await sleep(500);
             await props.action();
         } catch { }
         loadingRef.current = false;

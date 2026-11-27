@@ -65,6 +65,7 @@ const MenuInBottomLayout = () => {
 
     const [state, setState] = useState<string>('home');
     const [highlighterPosition, setHighlighterPosition] = useState("50%");
+    const [notificationsCount, setNotificationsCount] = useState<number>(UserGlobal.user?.unseen_notifications ?? 0);
 
     const { t } = useTranslation();
 
@@ -138,28 +139,24 @@ const MenuInBottomLayout = () => {
         scale: '1',
     };
 
-    var workerScript: boolean = false;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile && !localStorage.getItem('pwa_dialog')) {
-        if (navigator.serviceWorker) {
-            navigator.serviceWorker.getRegistration('/').then((registration) => {
-                if (registration) {
-                    console.log('PWA Mode: Yes (Service Worker Registered)');
-                } else {
-                    setPWAVisible(true);
-                }
-            });
-        } else {
-            workerScript = true;
-        }
+    const reloadNotificationCount = async () => {
+        await UserGlobal.reloadUser();
+        setNotificationsCount(UserGlobal.user?.unseen_notifications ?? 0);
     }
 
-    const [pwaVisible, setPWAVisible] = React.useState<boolean>(workerScript);
-    const notificationsCount: number = UserGlobal.user?.unseen_notifications ?? 0;
+    React.useEffect(() => {
+        if (!UserGlobal.user)
+            return;
 
-    // if (pwaVisible && !appMode) {
-    //     return <Box></Box>
-    // }
+        const intervalId = setInterval(() => {
+            reloadNotificationCount();
+        }, 60000);
+        return () => clearInterval(intervalId);
+    }, []);
+
+    React.useEffect(() => {
+        setNotificationsCount(UserGlobal.user?.unseen_notifications ?? 0);
+    }, [UserGlobal.user]);
 
     return <Box>
         <Outlet />

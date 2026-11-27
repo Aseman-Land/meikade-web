@@ -32,7 +32,7 @@ const FollowList = (props: FollowListProps) => {
         setIsLoading(true);
         try {
             setUsers([]);
-            await sleep(1000);
+            // await sleep(1000);
             const result = await props.reloadMethod(props.user.id);
             if (result && result.status && result.result) {
                 setUsers(result.result);

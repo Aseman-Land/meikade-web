@@ -33,7 +33,7 @@ const MyAchievementsDialog = (props: MyAchievementsDialogProps) => {
         loadingRef.current = true;
         setIsLoading(true);
         try {
-            await sleep(500);
+            // await sleep(500);
             const achievements = await MkAchievementServices.getUserAchievements(props.userId);
             const achievementProgresses = await MkAchievementServices.getAchievementsProgresses();
 

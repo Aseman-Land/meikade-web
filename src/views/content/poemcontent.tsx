@@ -167,7 +167,7 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                         verses: [verse]
                     });
                 })
-                await sleep(500);
+                // await sleep(500);
 
                 setHasGanjoorAnalizing(hasGanjoorAnalizing);
                 setVersesList(offset > 0 ? [...versesList, ...result.result.verses] : result.result.verses);
@@ -189,12 +189,14 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
         } catch {
         }
 
-        await sleep(500);
+        // await sleep(500);
         initializedRef.current = true;
 
         if (UserGlobal.user) {
-            await reloadListsStatuses();
-            await reloadNotesStatuses();
+            await Promise.all([
+                await reloadListsStatuses(),
+                await reloadNotesStatuses(),
+            ]);
         }
 
         setIsLoading(false);
@@ -242,7 +244,7 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
         } catch {
         }
 
-        await sleep(500);
+        // await sleep(500);
         setIsLoadingNote(false);
     }
 
