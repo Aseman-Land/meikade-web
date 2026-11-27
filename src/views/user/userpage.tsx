@@ -306,7 +306,7 @@ export const UserPageBase = React.forwardRef<UserPageBaseRef, UserPageBaseProps>
 
                 const sections = new Array<SectionItemData>();
                 if (user.total_contents && user.total_contents > 0) sections.push({ title: t("content"), value: user.total_contents });
-                if (user.total_rates && user.total_rates > 0) sections.push({ title: t("rate"), value: user.total_rates });
+                if (user.total_rates && user.total_rates > 0) sections.push({ title: t("user-rates"), value: user.total_rates });
                 if (user.total_views && user.total_views > 0) sections.push({ title: t("view"), value: user.total_views });
                 if (achievements.result && achievements.result.length > 0) sections.push({ title: t("achievements.title"), value: achievements.result.length });
                 if (activities.result) {

@@ -165,7 +165,7 @@ const ShareItem = (props: ShareItemProps) => {
                         minWidth: '80px',
                     }}
                 >
-                    {t('contents.share.colors.color-title')}
+                    {t('contents.share.colors.background-title')}
                 </Typography>
                 <Select
                     fullWidth
@@ -195,7 +195,7 @@ const ShareItem = (props: ShareItemProps) => {
                         minWidth: '80px',
                     }}
                 >
-                    {t('contents.share.colors.background-title')}
+                    {t('contents.share.colors.color-title')}
                 </Typography>
                 <Select
                     fullWidth

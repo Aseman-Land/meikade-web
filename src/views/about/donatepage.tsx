@@ -203,16 +203,6 @@ const DonatePage = () => {
 
     const donationMethods: DonateMethods[] = [
         {
-            title: t('donation_methods.daramet.title'),
-            description: t('donation_methods.daramet.description'),
-            button: t('donation_methods.daramet.button'),
-            account_owner: null,
-            address: "https://daramet.com/meikade",
-            shareUrl: null,
-            url: null,
-            icon: "/assets/images/donate/daramet.svg",
-        },
-        {
             title: t('donation_methods.donito.title'),
             description: t('donation_methods.donito.description'),
             button: t('donation_methods.donito.button'),
@@ -221,6 +211,16 @@ const DonatePage = () => {
             shareUrl: null,
             url: null,
             icon: darkMode ? "/assets/images/donate/donito-dark.png" : "/assets/images/donate/donito-light.png",
+        },
+        {
+            title: t('donation_methods.daramet.title'),
+            description: t('donation_methods.daramet.description'),
+            button: t('donation_methods.daramet.button'),
+            account_owner: null,
+            address: "https://daramet.com/meikade",
+            shareUrl: null,
+            url: null,
+            icon: "/assets/images/donate/daramet.svg",
         },
         {
             title: t('donation_methods.bitcoin.title'),
@@ -432,14 +432,38 @@ const DonatePage = () => {
                     }}
                 >
                     <Typography>{currentMethod.description}</Typography>
+                    {currentMethod.address && <Box
+                        sx={{
+                            alignSelf: 'center',
+                            margin: '10px 0px',
+                        }}
+                    >
+                        <QRCode
+                            value={currentMethod.address}
+                            size={200}
+                            bgColor="#FFFFFF"
+                            fgColor="#000000"
+                            level="L"
+                        />
+                    </Box>}
+                    {currentMethod.account_owner &&
+                        <Typography sx={{
+                            alignSelf: 'center',
+                            padding: '4px 20px',
+                            background: alpha(theme.palette.text.primary, 0.06),
+                            borderRadius: `${globalBorderRadiusValue / 2}px`,
+                        }}
+                        >
+                            {currentMethod.account_owner}
+                        </Typography>
+                    }
                     {currentMethod.address && <Button
+                        variant='contained'
+                        disableElevation
                         sx={{
                             display: 'flex',
                             flexDirection: 'row',
                             padding: '10px',
-                            background: alpha(theme.palette.text.primary, 0.06),
-                            borderRadius: `${globalBorderRadiusValue / 2}px`,
-                            color: 'unset',
                             gap: '6px',
                         }}
                         onClick={() => {
@@ -465,33 +489,37 @@ const DonatePage = () => {
                             <CopyAllOutlined />
                         }
                     </Button>}
-                    {currentMethod.account_owner && <Typography>{currentMethod.account_owner}</Typography>}
-                    {currentMethod.address && <Box
+                    <Box
                         sx={{
-                            alignSelf: 'center',
-                            margin: '20px 0px',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: '10px',
                         }}
                     >
-                        <QRCode
-                            value={currentMethod.address}
-                            size={100}
-                            bgColor="#FFFFFF"
-                            fgColor="#000000"
-                            level="L"
-                        />
-                    </Box>}
-                    <Typography>
-                        {t('app.spiritual_support.submit_donate.submit-info')}
-                    </Typography>
-                    <Button
-                        variant='contained'
-                        disableElevation
-                        onClick={() => setSubmitDonateDialog(true)}
-                    >
-                        <Typography>
-                            {t('app.spiritual_support.submit_donate.title')}
+                        <Typography
+                            sx={{
+                                textAlign: 'justify',
+                                opacity: 0.7,
+                                fontSize: '12px',
+                            }}
+                        >
+                            {t('app.spiritual_support.submit_donate.submit-info')}
                         </Typography>
-                    </Button>
+                        <Button
+                            variant='outlined'
+                            disableElevation
+                            sx={{
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0,
+                                minWidth: 'max-content',
+                            }}
+                            onClick={() => setSubmitDonateDialog(true)}
+                        >
+                            <Typography>
+                                {t('app.spiritual_support.submit_donate.title')}
+                            </Typography>
+                        </Button>
+                    </Box>
                 </Box>
             }
         </MeikadeDrawer>

@@ -52,6 +52,7 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
     const quoteContentVerse = content ? content.activity?.target_content_verse : undefined;
     const quoteContent = quoteContentVerse ? quoteContentVerse.content : content ? content.activity?.target_content : undefined;
 
+    const appBarHeight: number = 60;
     const coverHeight: number = 180;
     const toolBarHeight: number = 36;
     const actionBarHeight: number = 50;
@@ -68,8 +69,13 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
     const [notedVerseIds, setNotedVerseIds] = React.useState<Map<number, string>>(new Map<number, string>());
 
     const coverRef = React.useRef<HTMLDivElement | null>(null);
-    const [actionBarBottomY, setActionBarBottomY] = React.useState<number>(0);
+    const coverProfileRef = React.useRef<HTMLDivElement | null>(null);
+    const coverCompactHeaderRef = React.useRef<HTMLDivElement | null>(null);
+    const coverNavigationRef = React.useRef<HTMLDivElement | null>(null);
+    const scrollFrameRef = React.useRef<number | null>(null);
+
     const [actionBarVisible, setActionBarVisible] = React.useState<boolean>(true);
+    const actionBarVisibleRef = React.useRef<boolean>(true);
 
     const [hasGanjoorAnalizing, setHasGanjoorAnalizing] = React.useState<boolean>(false);
     const [ganjoorAnalizing, setGanjoorAnalizing] = React.useState<boolean>(localStorage.getItem('ganjoor_analizing_visible') == 'true' ? true : false);
@@ -86,10 +92,9 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
 
     const [versesList, setVersesList] = React.useState<Array<MkContentVerses>>([]);
     const [verses, setVerses] = React.useState<Array<VerseGroup>>([]);
+    // Used only as the direction-change anchor for the action bar. The live
+    // scroll position is intentionally not kept in React state.
     const lastScrollYRef = React.useRef<number>(0);
-    const [scrollY, setScrollY] = React.useState<number>(() =>
-        typeof window !== "undefined" ? window.scrollY : 0
-    );
 
     const [isLoadingNote, setIsLoadingNote] = React.useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -352,62 +357,87 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
     }
 
     React.useEffect(() => {
-        const update = () => {
-            if (!coverRef.current)
+        let isDisposed = false;
+
+        const updateScrollFrame = () => {
+            scrollFrameRef.current = null;
+            if (isDisposed)
                 return;
 
-            const rect = coverRef.current.getBoundingClientRect();
-            setActionBarBottomY(rect.bottom);
+            const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+            const visibleHeight = Math.max(toolBarHeight, coverHeight - y);
+            const progress = Math.min(
+                1,
+                Math.max(0, (coverHeight - visibleHeight) / (coverHeight - toolBarHeight))
+            );
+
+            if (coverRef.current) {
+                coverRef.current.style.setProperty('--cover-visible-height', `${visibleHeight}px`);
+                coverRef.current.style.setProperty('--cover-progress', progress.toFixed(4));
+            }
+
+            // Avoid invisible controls intercepting taps during the transition.
+            if (coverProfileRef.current)
+                coverProfileRef.current.style.pointerEvents = progress < 0.99 ? 'auto' : 'none';
+            if (coverCompactHeaderRef.current)
+                coverCompactHeaderRef.current.style.pointerEvents = progress > 0.02 ? 'auto' : 'none';
+            if (coverNavigationRef.current)
+                coverNavigationRef.current.style.pointerEvents = progress < 0.95 ? 'auto' : 'none';
+
+            // Preserve the existing 100px scroll-direction threshold. State is
+            // changed only when the action bar actually hides or reappears.
+            const anchorY = lastScrollYRef.current;
+            if (actionBarVisibleRef.current) {
+                if (y > anchorY) {
+                    if (y > anchorY + 100 && y > 400) {
+                        actionBarVisibleRef.current = false;
+                        setActionBarVisible(false);
+                        lastScrollYRef.current = y;
+                    }
+                } else {
+                    lastScrollYRef.current = y;
+                }
+            } else {
+                if (y < anchorY) {
+                    if (y < anchorY - 100) {
+                        actionBarVisibleRef.current = true;
+                        setActionBarVisible(true);
+                        lastScrollYRef.current = y;
+                    }
+                } else {
+                    lastScrollYRef.current = y;
+                }
+            }
         };
 
-        update();
-        window.addEventListener('resize', update);
-        window.addEventListener('scroll', update);
+        const scheduleScrollFrame = () => {
+            if (scrollFrameRef.current !== null)
+                return;
+
+            scrollFrameRef.current = window.requestAnimationFrame(updateScrollFrame);
+        };
+
+        // Also handles a page restored at a non-zero scroll position.
+        updateScrollFrame();
+        window.addEventListener('scroll', scheduleScrollFrame, { passive: true });
+        window.addEventListener('resize', scheduleScrollFrame, { passive: true });
 
         return () => {
-            window.removeEventListener('resize', update);
-            window.removeEventListener('scroll', update);
+            isDisposed = true;
+            window.removeEventListener('scroll', scheduleScrollFrame);
+            window.removeEventListener('resize', scheduleScrollFrame);
+            if (scrollFrameRef.current !== null) {
+                window.cancelAnimationFrame(scrollFrameRef.current);
+                scrollFrameRef.current = null;
+            }
         };
-    }, []);
+    }, [coverHeight, toolBarHeight]);
 
     React.useEffect(() => {
         if (inView && hasMore) {
             more();
         }
     }, [inView]);
-
-    React.useEffect(() => {
-        const onScroll = () => {
-            const y = window.scrollY ?? document.documentElement.scrollTop ?? 0;
-            setScrollY(y);
-        };
-
-        window.addEventListener("scroll", onScroll, { passive: true });
-        return () => window.removeEventListener("scroll", onScroll);
-    }, []);
-
-    React.useEffect(() => {
-        const y = scrollY;
-        if (actionBarVisible) {
-            if (y > lastScrollYRef.current) {
-                if (y > lastScrollYRef.current + 100 && y > 400) {
-                    setActionBarVisible(false);
-                    lastScrollYRef.current = y;
-                }
-            } else {
-                lastScrollYRef.current = y;
-            }
-        } else {
-            if (y < lastScrollYRef.current) {
-                if (y < lastScrollYRef.current - 100) {
-                    setActionBarVisible(true);
-                    lastScrollYRef.current = y;
-                }
-            } else {
-                lastScrollYRef.current = y;
-            }
-        }
-    }, [scrollY]);
 
     React.useEffect(() => {
         reload()
@@ -466,29 +496,38 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                     sx={{
                         width: '100%',
                         maxWidth: 'sm',
-                        height: Math.max(toolBarHeight, coverHeight - scrollY).toString() + 'px',
+                        height: `${coverHeight}px`,
+                        '--cover-visible-height': `${coverHeight}px`,
+                        '--cover-progress': 0,
                         background: 'url(/assets/images/meikade_cover.jpg)',
                         backgroundColor: theme.palette.primary.light,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
                         position: 'fixed',
-                        zIndex: coverHeight - scrollY < 100 || scrollY <= 3 ? 100 : -100,
+                        top: `${appBarHeight}px`,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: theme.zIndex.appBar - 1,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
                         overflow: 'hidden',
+                        clipPath: 'inset(0 0 calc(100% - var(--cover-visible-height, 180px)) 0)',
+                        willChange: 'clip-path',
+                        pointerEvents: 'auto',
                     }}
                 >
 
                     <Box
+                        ref={coverProfileRef}
                         sx={{
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            color: "#fff",
+                            color: '#fff',
                             position: 'absolute',
-                            opacity: Math.max(0, (coverHeight - scrollY - toolBarHeight) / (coverHeight - toolBarHeight)),
+                            opacity: 'calc(1 - var(--cover-progress, 0))',
                         }}
                     >
                         {content.owner && <>
@@ -520,16 +559,21 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                     </Box>
 
                     <Box
+                        ref={coverCompactHeaderRef}
                         sx={{
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'center',
                             width: '100%',
+                            height: `${toolBarHeight}px`,
+                            boxSizing: 'border-box',
                             padding: '0px 10px 0px 20px',
-                            color: "#fff",
+                            color: '#fff',
                             position: 'absolute',
+                            top: 0,
+                            left: 0,
                             gap: '10px',
-                            opacity: 1 - Math.max(0, (coverHeight - scrollY - toolBarHeight) / (coverHeight - toolBarHeight)),
+                            opacity: 'var(--cover-progress, 0)',
                             justifyContent: 'space-between',
                         }}
                     >
@@ -573,15 +617,20 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                     </Box>
 
                     <Box
+                        ref={coverNavigationRef}
                         sx={{
-                            display: Math.max(0, (coverHeight - scrollY - toolBarHeight) / (coverHeight - toolBarHeight)) > 0.1 ? 'flex' : 'none',
+                            display: 'flex',
                             flexDirection: 'row',
-                            padding: '20px',
+                            padding: '0px 20px',
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             position: 'absolute',
-                            width: 'calc(100% + 20px)',
-                            opacity: Math.max(0, (coverHeight - scrollY - toolBarHeight) / (coverHeight - toolBarHeight)),
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: 'var(--cover-visible-height, 180px)',
+                            boxSizing: 'border-box',
+                            opacity: 'calc(1 - var(--cover-progress, 0))',
                         }}
                     >
                         <Box>
@@ -594,7 +643,7 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                                     padding: '0px',
                                     width: '34px',
                                     minWidth: 'unset',
-                                    height: Math.max(toolBarHeight, coverHeight - scrollY).toString() + 'px',
+                                    height: 'var(--cover-visible-height, 180px)',
                                 }}
                                 onClick={() => navigate(`/content/${content.previous_content_id}`, { replace: true })}
                             >
@@ -611,7 +660,7 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                                     padding: '0px',
                                     width: '34px',
                                     minWidth: 'unset',
-                                    height: Math.max(toolBarHeight, coverHeight - scrollY).toString() + 'px',
+                                    height: 'var(--cover-visible-height, 180px)',
                                 }}
                                 onClick={() => navigate(`/content/${content.next_content_id}`, { replace: true })}
                             >
@@ -633,12 +682,14 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                         sx={{
                             width: '100%',
                             maxWidth: 'sm',
-                            height: actionBarHeight.toString() + 'px',
-                            zIndex: 10,
-                            position: toolBarHeight < coverHeight - scrollY ? 'absolute' : 'fixed',
-                            top: toolBarHeight < coverHeight - scrollY ? 'unset' : actionBarBottomY.toString() + 'px',
-                            transition: 'margin-top 0.15s ease-in-out',
-                            marginTop: (actionBarVisible ? 0 : -actionBarHeight).toString() + 'px'
+                            height: `${actionBarHeight}px`,
+                            position: 'sticky',
+                            top: `${appBarHeight + toolBarHeight}px`,
+                            zIndex: theme.zIndex.appBar - 2,
+                            transform: actionBarVisible ? 'translateY(0)' : 'translateY(-110%)',
+                            transition: 'transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+                            pointerEvents: actionBarVisible ? 'auto' : 'none',
+                            willChange: 'transform',
                         }}
                     >
                         <Box
@@ -690,7 +741,6 @@ const PoemContent = React.forwardRef<PoemContentRef, PoemContentProps>((props: P
                             </Box>
                         </Box>
                     </Box>
-                    <Box sx={{ width: '1px', height: actionBarHeight }} />
                     {hasGanjoorAnalizing && ganjoorAnalizingWarn &&
                         <Box
                             sx={{
