@@ -1,4 +1,3 @@
-
 # Meikade Web
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
@@ -102,6 +101,16 @@ The live web application is available at <https://app.meikade.com>.
 - **Native Meikade application:** <https://github.com/Aseman-Land/Meikade>
 - **Meikade Web:** <https://github.com/Aseman-Land/meikade-web>
 - **Live web application:** <https://app.meikade.com>
+
+## Support Meikade
+
+Meikade is built for everyone who loves Persian poetry. Keeping the service available and continuing to improve it takes ongoing effort and resources. Your support helps us keep Meikade online and bring new features to the community.
+
+**All donations are used exclusively to cover server costs, maintain the infrastructure, and develop new features.**
+
+If you would like to support the project, you can make a contribution here:
+
+**[Support Meikade](https://app.meikade.com/donate)**
 
 ## License
 
