@@ -199,7 +199,7 @@ export const LegacySignin = (props: LegacySigninProps) => {
                 name="username"
                 autoComplete="username"
                 fullWidth
-                label={t('user.username')}
+                label={t('user.username_or_email')}
                 required
                 sx={{
                     direction: 'ltr',
