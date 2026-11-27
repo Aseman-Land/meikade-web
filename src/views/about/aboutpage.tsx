@@ -130,6 +130,18 @@ const AboutPage = () => {
                 >
                     {t('app.about')}
                 </Typography>
+                <Button
+                    variant='contained'
+                    disableElevation
+                    sx={{
+                        backgroundColor: alpha(theme.palette.text.primary, 0.6)
+                    }}
+                    onClick={() => {
+                        window.open('https://github.com/Aseman-Land/meikade-web', '_blank', 'noopener,noreferrer');
+                    }}
+                >
+                    <Typography>{t('github-link')}</Typography>
+                </Button>
             </Box>
 
             <Box sx={sectionStyle} >
@@ -263,6 +275,18 @@ const AboutPage = () => {
                 >
                     {t('app.aseman.description')}
                 </Typography>
+                <Button
+                    variant='contained'
+                    disableElevation
+                    sx={{
+                        backgroundColor: alpha(theme.palette.text.primary, 0.6)
+                    }}
+                    onClick={() => {
+                        window.open('https://aseman.io', '_blank', 'noopener,noreferrer');
+                    }}
+                >
+                    <Typography>{t('aseman-link')}</Typography>
+                </Button>
             </Box>
         </Box>
     </Container>
