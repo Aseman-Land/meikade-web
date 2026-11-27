@@ -79,6 +79,18 @@ const Register = (props: RegisterProps) => {
         setIsLoading(false);
     };
 
+    const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = event.target.value;
+
+        let sanitized = raw.replace(/[^a-zA-Z0-9_]/g, '');
+        sanitized = sanitized.replace(/^[0-9]+/, '');
+        if (sanitized !== raw) {
+            globalHandleError(t('errors.keyboard-english'));
+        }
+
+        setUsername(sanitized);
+    };
+
     React.useEffect(() => {
         const token = localStorage.getItem('register_token');
         setRegisterToken(token);
@@ -145,13 +157,7 @@ const Register = (props: RegisterProps) => {
                                     inputMode: 'latin',
                                 },
                             }}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                const inputVal = event.target.value;
-                                const englishOnly = inputVal.replace(/[^a-zA-Z\s]/g, '');
-                                if (englishOnly != inputVal)
-                                    globalHandleError(t('errors.keyboard-english'));
-                                setUsername(englishOnly.trim())
-                            }}
+                            onChange={handleUsernameChange}
                         />
                         <TextField
                             name="password"

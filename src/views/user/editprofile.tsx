@@ -114,6 +114,18 @@ const EditProfile = (props: EditProfileProps) => {
         }
     };
 
+    const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = event.target.value;
+
+        let sanitized = raw.replace(/[^a-zA-Z0-9_]/g, '');
+        sanitized = sanitized.replace(/^[0-9]+/, '');
+        if (sanitized !== raw) {
+            globalHandleError(t('errors.keyboard-english'));
+        }
+
+        setUsername(sanitized);
+    };
+
     React.useEffect(() => {
         if (!user)
             return;
@@ -181,13 +193,7 @@ const EditProfile = (props: EditProfileProps) => {
                         inputMode: 'latin',
                     },
                 }}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    const inputVal = event.target.value;
-                    const englishOnly = inputVal.replace(/[^a-zA-Z\s]/g, '');
-                    if (englishOnly != inputVal)
-                        globalHandleError(t('errors.keyboard-english'));
-                    setUsername(englishOnly.trim())
-                }}
+                onChange={handleUsernameChange}
             />}
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="fa-IR">
                 <DatePicker
