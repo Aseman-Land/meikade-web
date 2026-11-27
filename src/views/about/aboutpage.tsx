@@ -279,7 +279,8 @@ const AboutPage = () => {
                     variant='contained'
                     disableElevation
                     sx={{
-                        backgroundColor: alpha(theme.palette.text.primary, 0.6)
+                        backgroundColor: alpha(theme.palette.text.primary, 0.6),
+                        display: 'none',
                     }}
                     onClick={() => {
                         window.open('https://aseman.io', '_blank', 'noopener,noreferrer');
